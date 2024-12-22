@@ -1,0 +1,30 @@
+wget https://csapp.cs.cmu.edu/3e/attacklab.pdf
+wget https://csapp.cs.cmu.edu/3e/target1.tar
+
+./ctarget -q
+./hex2raw < hex1 > raw1
+./ctarget -q < raw1
+
+Level 1
+    栈帧：
+    返回地址（test中getbuf的下一条指令）
+    buf <- rsp
+
+    正常流程：getbuf接收buf后，先sub rsp指向返回地址，再pop返回地址到rip
+    修改流程：通过输入超过buf最大长度的字符串，将buf上方的返回地址覆盖成指定地址，达到pop指定地址到rip的目的
+
+    touch1没有入参，直接将touch1地址放在buf后
+
+Level 2
+    touch2有一个unsigned入参，不能直接跳转到touch2地址，需要先跳转到指定地址，
+    从该地址开始依次执行：赋值rdi（设置立即数为入参）、push touch2地址、ret，再跳转到touch2地址，
+    以上3条指令可以放在buf中，将起始地址放在buf后
+
+Level 3
+    touch3有一个char *入参，不能直接跳转到touch3地址，需要先跳转到指定地址，
+    从该地址开始依次执行：赋值rdi（设置存储器地址为入参）、push touch3地址、ret，再跳转到touch2地址，
+    以上3条指令放在buf中，将起始地址放在buf后，入参放在起始地址后
+
+Level 4
+
+Level 5
